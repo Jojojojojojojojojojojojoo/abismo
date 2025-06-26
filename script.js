@@ -50,16 +50,51 @@ formFicha.onsubmit = async (e) => {
   carregarFichas();
 };
 
+// Função para carregar fichas (já existente, mas atualizada)
 async function carregarFichas() {
   listaFichas.innerHTML = "";
   const snapshot = await db.collection("fichas")
     .where("uid", "==", currentUser.uid)
-    .orderBy("criado", "desc").get();
+    .orderBy("criado", "desc")
+    .get();
 
   snapshot.forEach(doc => {
     const ficha = doc.data();
     const item = document.createElement("li");
-    item.textContent = `${ficha.nome} (${ficha.classe}) - Força: ${ficha.forca}`;
+    item.innerHTML = `
+      ${ficha.nome} (${ficha.classe}) - Força: ${ficha.forca}
+      <button onclick="editarFicha('${doc.id}', '${ficha.nome}', '${ficha.classe}', '${ficha.forca}')">Editar</button>
+      <button onclick="deletarFicha('${doc.id}')">Excluir</button>
+    `;
     listaFichas.appendChild(item);
   });
+}
+
+// Função para deletar ficha
+async function deletarFicha(id) {
+  if (confirm("Tem certeza que quer excluir esta ficha?")) {
+    await db.collection("fichas").doc(id).delete();
+    carregarFichas();
+  }
+}
+
+// Função para abrir o modal de edição
+function editarFicha(id, nome, classe, forca) {
+  const modal = document.getElementById("editar-ficha-modal");
+  const form = document.getElementById("editar-ficha-form");
+  form.reset();
+  form.nome.value = nome;
+  form.classe.value = classe;
+  form.forca.value = forca;
+  modal.style.display = "block";
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
+    await db.collection("fichas").doc(id).update(data);
+    modal.style.display = "none";
+    carregarFichas();
+  };
+}
+
 }
