@@ -1,42 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Fichas RPG</title>
-  <link rel="stylesheet" href="style.css">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Início - Fichas RPG</title>
+  <style>
+    body {
+      margin: 0; height: 100vh;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #000;
+    }
+    h1 {
+      color: #fff;
+      margin-bottom: 3rem;
+      font-weight: 600;
+      font-size: 2.5rem;
+    }
+    .btn {
+      background: rgba(255, 255, 255, 0.85);
+      border: none;
+      padding: 1rem 3rem;
+      margin: 1rem;
+      border-radius: 12px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #000;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      min-width: 200px;
+      text-align: center;
+      user-select: none;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 1);
+    }
+  </style>
 </head>
 <body>
-  <h1>Minhas Fichas</h1>
-  <button id="login-btn">Entrar com Google</button>
-  <button id="logout-btn" style="display:none;">Sair</button>
-
-  <div id="fichas-area" style="display:none;">
-    <form id="form-ficha">
-      <input name="nome" placeholder="Nome do personagem" required><br>
-      <input name="classe" placeholder="Classe"><br>
-      <input name="forca" type="number" placeholder="Força"><br>
-      <button type="submit">Salvar Ficha</button>
-    </form>
-
-    <h2>Suas Fichas</h2>
-    <ul id="lista-fichas"></ul>
-<div id="editar-ficha-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:2rem; border:1px solid #ccc; z-index:1000;">
-  <h2>Editar Ficha</h2>
-  <form id="editar-ficha-form">
-    <input name="nome" placeholder="Nome do personagem" required><br>
-    <input name="classe" placeholder="Classe"><br>
-    <input name="forca" type="number" placeholder="Força"><br>
-    <button type="submit">Salvar Alterações</button>
-    <button type="button" onclick="document.getElementById('editar-ficha-modal').style.display='none'">Cancelar</button>
-  </form>
-</div>
-  </div>
-
-  <script src="script.js"></script>
+  <h1>Fichas RPG</h1>
+  <button class="btn" onclick="window.location.href='criando-ficha.html'">Nova Ficha</button>
+  <button class="btn" onclick="window.location.href='editar-fichas.html'">Editar Fichas</button>
 </body>
 </html>
-
