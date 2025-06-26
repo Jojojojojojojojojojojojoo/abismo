@@ -5,31 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Editar Fichas</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 2rem; background: #f0f2f5; }
-    h1 { text-align: center; margin-bottom: 1rem; }
-    ul { list-style: none; padding: 0; }
+    body {
+      background-color: #000;
+      color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #000;
+      color: #000;
+    }
+    h1 {
+      color: #fff;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
     li {
-      background: white; margin-bottom: 1rem; padding: 1rem; border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255, 255, 255, 0.85);
+      margin-bottom: 1rem;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #000;
+    }
+    .info {
+      flex-grow: 1;
+      font-weight: 600;
     }
     button {
-      background: #4a90e2; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px;
-      cursor: pointer; margin-left: 0.5rem;
+      background: rgba(255, 255, 255, 0.85);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      color: #000;
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+    button:hover {
+      background: rgba(255, 255, 255, 1);
+    }
+    .edit-form {
+      display: none;
+      margin-top: 1rem;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 1rem;
+      border-radius: 10px;
+      color: #000;
+    }
+    .edit-form p {
+      margin: 0.5rem 0;
+    }
+    .btn-voltar {
+      display: block;
+      margin: 2rem auto 0;
+      padding: 0.7rem 2rem;
+      background: rgba(255, 255, 255, 0.85);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      user-select: none;
       transition: background 0.3s ease;
     }
-    button:hover { background: #357ABD; }
-    .edit-form {
-      display: none; margin-top: 1rem; background: #e9f0ff; padding: 1rem; border-radius: 6px;
-    }
-    .edit-form input {
-      padding: 0.5rem; margin-right: 0.5rem; border-radius: 4px; border: 1px solid #ccc;
+    .btn-voltar:hover {
+      background: rgba(255, 255, 255, 1);
     }
   </style>
 </head>
 <body>
   <h1>Editar suas Fichas</h1>
   <ul id="lista-fichas"></ul>
+  <button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -55,64 +114,45 @@
 
     async function carregarFichas() {
       listaFichas.innerHTML = '';
-      const snapshot = await db.collection('fichas')
-        .where('uid', '==', currentUser.uid)
-        .orderBy('criado', 'desc')
-        .get();
-
-      snapshot.forEach(doc => {
-        const ficha = doc.data();
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <div>
-            <strong>Origem:</strong> <span class="origem">${ficha.origem}</span><br>
-            <strong>Classe:</strong> <span class="classe">${ficha.classe}</span>
-          </div>
-          <div>
-            <button onclick="mostrarEditar('${doc.id}', this)">Editar</button>
-            <button onclick="excluirFicha('${doc.id}')">Excluir</button>
-          </div>
-          <form class="edit-form" onsubmit="salvarEdicao(event, '${doc.id}', this)">
-            <input name="origem" value="${ficha.origem}" required />
-            <input name="classe" value="${ficha.classe}" required />
-            <button type="submit">Salvar</button>
-            <button type="button" onclick="fecharEditar(this)">Cancelar</button>
-          </form>
-        `;
-        listaFichas.appendChild(li);
-      });
-    }
-
-    function mostrarEditar(id, btn) {
-      const li = btn.closest('li');
-      li.querySelector('.edit-form').style.display = 'block';
-      btn.style.display = 'none';
-      li.querySelector('button:nth-child(2)').style.display = 'none'; // Esconde excluir enquanto edita
-    }
-
-    function fecharEditar(form) {
-      form.style.display = 'none';
-      const li = form.closest('li');
-      li.querySelector('button').style.display = 'inline-block'; // Mostrar botão editar
-      li.querySelector('button:nth-child(2)').style.display = 'inline-block'; // Mostrar excluir
-    }
-
-    async function salvarEdicao(e, id, form) {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(form).entries());
       try {
-        await db.collection('fichas').doc(id).update(data);
-        alert('Ficha atualizada!');
-        carregarFichas();
-      } catch (err) {
-        alert('Erro ao atualizar: ' + err.message);
+        const snapshot = await db.collection('fichas')
+          .where('uid', '==', currentUser.uid)
+          .orderBy('criado', 'desc')
+          .get();
+
+        if (snapshot.empty) {
+          listaFichas.innerHTML = '<li style="color:#fff; text-align:center;">Nenhuma ficha encontrada.</li>';
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const ficha = doc.data();
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <div class="info">
+              <p><strong>Origem:</strong> ${ficha.origem}</p>
+              <p><strong>Classe:</strong> ${ficha.classe}</p>
+            </div>
+            <div>
+              <button onclick="excluirFicha('${doc.id}')">Excluir</button>
+            </div>
+          `;
+          listaFichas.appendChild(li);
+        });
+      } catch (e) {
+        listaFichas.innerHTML = '<li style="color:#fff; text-align:center;">Erro ao carregar fichas.</li>';
+        console.error(e);
       }
     }
 
     async function excluirFicha(id) {
       if (confirm('Tem certeza que quer excluir esta ficha?')) {
-        await db.collection('fichas').doc(id).delete();
-        carregarFichas();
+        try {
+          await db.collection('fichas').doc(id).delete();
+          carregarFichas();
+        } catch (e) {
+          alert('Erro ao excluir ficha: ' + e.message);
+        }
       }
     }
   </script>
