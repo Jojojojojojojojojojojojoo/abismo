@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Criando Ficha</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 2rem; max-width: 600px; margin: auto; }
+    h1 { text-align: center; margin-bottom: 1rem; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .opcoes { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1rem; }
+    .opcao {
+      background: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: pointer; flex: 1 1 150px; text-align: center; transition: background 0.3s ease;
+    }
+    .opcao:hover, .opcao.selected { background: #4a90e2; color: white; }
+    .descricao { margin: 1rem 0; font-style: italic; min-height: 60px; }
+    button {
+      background: #4a90e2; color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 6px;
+      cursor: pointer; font-size: 1rem; margin-top: 1rem; display: block; margin-left: auto; margin-right: auto;
+      transition: background 0.3s ease;
+    }
+    button:disabled { background: #a0b9e8; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <h1>Criando Ficha</h1>
+
+  <!-- Passo 1: Escolher Origem -->
+  <div id="step-origem" class="step active">
+    <h2>Escolha a Origem</h2>
+    <div class="opcoes" id="origem-lista">
+      <div class="opcao" data-nome="Nobre">Nobre</div>
+      <div class="opcao" data-nome="Povo">Povo</div>
+      <div class="opcao" data-nome="Forasteiro">Forasteiro</div>
+    </div>
+    <div class="descricao" id="desc-origem"></div>
+    <button id="btn-origem" disabled>Próximo</button>
+  </div>
+
+  <!-- Passo 2: Escolher Classe -->
+  <div id="step-classe" class="step">
+    <h2>Escolha a Classe</h2>
+    <div class="opcoes" id="classe-lista">
+      <!-- Será preenchido por JS -->
+    </div>
+    <div class="descricao" id="desc-classe"></div>
+    <button id="btn-classe" disabled>Finalizar Ficha</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <script>
+    // Inicializa Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Variáveis para armazenar escolhas
+    let origemSelecionada = null;
+    let classeSelecionada = null;
+
+    // Descrições das origens
+    const descricoesOrigem = {
+      'Nobre': 'Você vem de uma família rica e influente, com acesso a recursos e conexões.',
+      'Povo': 'Você é do povo comum, com habilidades práticas e muita determinação.',
+      'Forasteiro': 'Você é um viajante ou estrangeiro, acostumado a ambientes hostis e desconhecidos.'
+    };
+
+    // Classes e descrições
+    const classes = [
+      { nome: 'Lutador', descricao: 'Ganha bônus em força e resistência, especialista em combate corpo a corpo.' },
+      { nome: 'Cozinheiro', descricao: 'Habilidade em preparar alimentos que curam e fortalecem aliados.' },
+      { nome: 'Arqueiro', descricao: 'Especialista em ataques à distância com arco e flecha.' },
+      { nome: 'Domador', descricao: 'Capaz de domar e controlar animais selvagens.' },
+      { nome: 'Fazendeiro', descricao: 'Conhecimento em agricultura e sobrevivência no campo.' },
+      { nome: 'Religioso', descricao: 'Conexão espiritual que permite usar magias de cura e proteção.' }
+    ];
+
+    // Elementos DOM
+    const origemLista = document.getElementById('origem-lista');
+    const descOrigem = document.getElementById('desc-origem');
+    const btnOrigem = document.getElementById('btn-origem');
+
+    const classeLista = document.getElementById('classe-lista');
+    const descClasse = document.getElementById('desc-classe');
+    const btnClasse = document.getElementById('btn-classe');
+
+    const stepOrigem = document.getElementById('step-origem');
+    const stepClasse = document.getElementById('step-classe');
+
+    // Função para criar opções de classe
+    function criarOpcoesClasse() {
+      classes.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'opcao';
+        div.textContent = c.nome;
+        div.dataset.nome = c.nome;
+        classeLista.appendChild(div);
+
+        div.addEventListener('click', () => {
+          // Remove seleção anterior
+          document.querySelectorAll('#classe-lista .opcao').forEach(el => el.classList.remove('selected'));
+          div.classList.add('selected');
+          classeSelecionada = c.nome;
+          descClasse.textContent = c.descricao;
+          btnClasse.disabled = false;
+        });
+      });
+    }
+
+    // Eventos para origem
+    origemLista.querySelectorAll('.opcao').forEach(div => {
+      div.addEventListener('click', () => {
+        // Remove seleção anterior
+        origemLista.querySelectorAll('.opcao').forEach(el => el.classList.remove('selected'));
+        div.classList.add('selected');
+        origemSelecionada = div.dataset.nome;
+        descOrigem.textContent = descricoesOrigem[origemSelecionada];
+        btnOrigem.disabled = false;
+      });
+    });
+
+    btnOrigem.addEventListener('click', () => {
+      if (!origemSelecionada) return;
+      // Vai para o passo da classe
+      stepOrigem.classList.remove('active');
+      stepClasse.classList.add('active');
+      criarOpcoesClasse();
+    });
+
+    btnClasse.addEventListener('click', async () => {
+      if (!classeSelecionada) return;
+
+      // Verifica se usuário está logado
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Você precisa estar logado para salvar a ficha.');
+        return;
+      }
+
+      // Salva ficha no Firestore
+      try {
+        await db.collection('fichas').add({
+          uid: user.uid,
+          origem: origemSelecionada,
+          classe: classeSelecionada,
+          criado: new Date()
+        });
+        alert('Ficha criada com sucesso!');
+        // Redireciona para página de edição ou lista de fichas
+        window.location.href = 'editar-fichas.html';
+      } catch (e) {
+        alert('Erro ao salvar ficha: ' + e.message);
+      }
+    });
+
+    // Autenticação simples para teste (Google)
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      }
+    });
+  </script>
+</body>
+</html>
