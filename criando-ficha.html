@@ -5,30 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Criando Ficha</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 2rem; max-width: 600px; margin: auto; }
-    h1 { text-align: center; margin-bottom: 1rem; }
-    .step { display: none; }
-    .step.active { display: block; }
-    .opcoes { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1rem; }
+    body {
+      background-color: #000;
+      color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 480px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #000;
+      color: #000;
+    }
+    h1, h2 {
+      color: #fff;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    .step {
+      display: none;
+    }
+    .step.active {
+      display: block;
+    }
+    .opcoes {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
     .opcao {
-      background: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      cursor: pointer; flex: 1 1 150px; text-align: center; transition: background 0.3s ease;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 1.2rem 1.8rem;
+      border-radius: 10px;
+      cursor: pointer;
+      flex: 1 1 140px;
+      text-align: center;
+      font-weight: 600;
+      color: #000;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+      border: 2px solid transparent;
     }
-    .opcao:hover, .opcao.selected { background: #4a90e2; color: white; }
-    .descricao { margin: 1rem 0; font-style: italic; min-height: 60px; }
+    .opcao:hover {
+      background-color: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    }
+    .opcao.selected {
+      background-color: #fff;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+      border-color: #ccc;
+    }
+    .descricao {
+      font-style: italic;
+      font-size: 1rem;
+      color: #ccc;
+      min-height: 70px;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      padding: 0 1rem;
+    }
     button {
-      background: #4a90e2; color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 6px;
-      cursor: pointer; font-size: 1rem; margin-top: 1rem; display: block; margin-left: auto; margin-right: auto;
-      transition: background 0.3s ease;
+      background-color: rgba(255, 255, 255, 0.85);
+      color: #000;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
-    button:disabled { background: #a0b9e8; cursor: not-allowed; }
+    button:disabled {
+      background-color: rgba(255, 255, 255, 0.4);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    button:hover:not(:disabled) {
+      background-color: #fff;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+    }
   </style>
 </head>
 <body>
 
   <h1>Criando Ficha</h1>
 
-  <!-- Passo 1: Escolher Origem -->
   <div id="step-origem" class="step active">
     <h2>Escolha a Origem</h2>
     <div class="opcoes" id="origem-lista">
@@ -40,12 +105,9 @@
     <button id="btn-origem" disabled>Próximo</button>
   </div>
 
-  <!-- Passo 2: Escolher Classe -->
   <div id="step-classe" class="step">
     <h2>Escolha a Classe</h2>
-    <div class="opcoes" id="classe-lista">
-      <!-- Será preenchido por JS -->
-    </div>
+    <div class="opcoes" id="classe-lista"></div>
     <div class="descricao" id="desc-classe"></div>
     <button id="btn-classe" disabled>Finalizar Ficha</button>
   </div>
@@ -56,23 +118,19 @@
   <script src="firebase-config.js"></script>
 
   <script>
-    // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Variáveis para armazenar escolhas
     let origemSelecionada = null;
     let classeSelecionada = null;
 
-    // Descrições das origens
     const descricoesOrigem = {
       'Nobre': 'Você vem de uma família rica e influente, com acesso a recursos e conexões.',
       'Povo': 'Você é do povo comum, com habilidades práticas e muita determinação.',
       'Forasteiro': 'Você é um viajante ou estrangeiro, acostumado a ambientes hostis e desconhecidos.'
     };
 
-    // Classes e descrições
     const classes = [
       { nome: 'Lutador', descricao: 'Ganha bônus em força e resistência, especialista em combate corpo a corpo.' },
       { nome: 'Cozinheiro', descricao: 'Habilidade em preparar alimentos que curam e fortalecem aliados.' },
@@ -82,7 +140,6 @@
       { nome: 'Religioso', descricao: 'Conexão espiritual que permite usar magias de cura e proteção.' }
     ];
 
-    // Elementos DOM
     const origemLista = document.getElementById('origem-lista');
     const descOrigem = document.getElementById('desc-origem');
     const btnOrigem = document.getElementById('btn-origem');
@@ -94,30 +151,8 @@
     const stepOrigem = document.getElementById('step-origem');
     const stepClasse = document.getElementById('step-classe');
 
-    // Função para criar opções de classe
-    function criarOpcoesClasse() {
-      classes.forEach(c => {
-        const div = document.createElement('div');
-        div.className = 'opcao';
-        div.textContent = c.nome;
-        div.dataset.nome = c.nome;
-        classeLista.appendChild(div);
-
-        div.addEventListener('click', () => {
-          // Remove seleção anterior
-          document.querySelectorAll('#classe-lista .opcao').forEach(el => el.classList.remove('selected'));
-          div.classList.add('selected');
-          classeSelecionada = c.nome;
-          descClasse.textContent = c.descricao;
-          btnClasse.disabled = false;
-        });
-      });
-    }
-
-    // Eventos para origem
     origemLista.querySelectorAll('.opcao').forEach(div => {
       div.addEventListener('click', () => {
-        // Remove seleção anterior
         origemLista.querySelectorAll('.opcao').forEach(el => el.classList.remove('selected'));
         div.classList.add('selected');
         origemSelecionada = div.dataset.nome;
@@ -128,23 +163,39 @@
 
     btnOrigem.addEventListener('click', () => {
       if (!origemSelecionada) return;
-      // Vai para o passo da classe
       stepOrigem.classList.remove('active');
       stepClasse.classList.add('active');
       criarOpcoesClasse();
     });
 
+    function criarOpcoesClasse() {
+      classeLista.innerHTML = '';
+      classes.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'opcao';
+        div.textContent = c.nome;
+        div.dataset.nome = c.nome;
+        classeLista.appendChild(div);
+
+        div.addEventListener('click', () => {
+          classeLista.querySelectorAll('.opcao').forEach(el => el.classList.remove('selected'));
+          div.classList.add('selected');
+          classeSelecionada = c.nome;
+          descClasse.textContent = c.descricao;
+          btnClasse.disabled = false;
+        });
+      });
+    }
+
     btnClasse.addEventListener('click', async () => {
       if (!classeSelecionada) return;
 
-      // Verifica se usuário está logado
       const user = auth.currentUser;
       if (!user) {
         alert('Você precisa estar logado para salvar a ficha.');
         return;
       }
 
-      // Salva ficha no Firestore
       try {
         await db.collection('fichas').add({
           uid: user.uid,
@@ -153,14 +204,12 @@
           criado: new Date()
         });
         alert('Ficha criada com sucesso!');
-        // Redireciona para página de edição ou lista de fichas
         window.location.href = 'editar-fichas.html';
       } catch (e) {
         alert('Erro ao salvar ficha: ' + e.message);
       }
     });
 
-    // Autenticação simples para teste (Google)
     auth.onAuthStateChanged(user => {
       if (!user) {
         auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
