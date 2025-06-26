@@ -1,4 +1,32 @@
-body { font-family: sans-serif; padding: 2rem; }
-form input { margin: 0.5rem 0; display: block; }
-button { margin-top: 1rem; }
+/* Estilo dos botões de ação */
+#lista-fichas li button {
+  margin-left: 1rem;
+  padding: 0.3rem 0.6rem;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
 
+#lista-fichas li button:nth-child(1) {
+  background: #4CAF50;
+}
+
+/* Estilo do modal */
+#editar-ficha-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#editar-ficha-modal button[type="submit"] {
+  background: #4CAF50;
+  color: white;
+}
+
+#editar-ficha-modal button[type="button"] {
+  background: #f44336;
+  color: white;
+}
