@@ -1,32 +1,97 @@
-/* Estilo dos botões de ação */
-#lista-fichas li button {
-  margin-left: 1rem;
-  padding: 0.3rem 0.6rem;
-  background: #f44336;
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #fafafa;
+  color: #333;
+  padding: 2rem;
+  max-width: 480px;
+  margin: 2rem auto;
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+  border-radius: 12px;
+}
+
+h1, h2 {
+  text-align: center;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 1.5rem;
+}
+
+.step {
+  display: none;
+}
+
+.step.active {
+  display: block;
+}
+
+.opcoes {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.opcao {
+  background: #fff;
+  padding: 1.2rem 1.8rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  flex: 1 1 140px;
+  text-align: center;
+  font-weight: 500;
+  color: #555;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+  border: 2px solid transparent;
+}
+
+.opcao:hover {
+  background-color: #e6f0ff;
+  color: #1a73e8;
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+
+.opcao.selected {
+  background-color: #1a73e8;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(26, 115, 232, 0.5);
+  border-color: #155ab6;
+}
+
+.descricao {
+  font-style: italic;
+  font-size: 1rem;
+  color: #666;
+  min-height: 70px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding: 0 1rem;
+}
+
+button {
+  background-color: #1a73e8;
   color: white;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-#lista-fichas li button:nth-child(1) {
-  background: #4CAF50;
-}
-
-/* Estilo do modal */
-#editar-ficha-modal {
-  background: white;
-  padding: 2rem;
+  padding: 0.75rem 2rem;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(26, 115, 232, 0.4);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-#editar-ficha-modal button[type="submit"] {
-  background: #4CAF50;
-  color: white;
+button:disabled {
+  background-color: #a8c0f0;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-#editar-ficha-modal button[type="button"] {
-  background: #f44336;
-  color: white;
+button:hover:not(:disabled) {
+  background-color: #155ab6;
+  box-shadow: 0 6px 14px rgba(21, 90, 182, 0.6);
 }
