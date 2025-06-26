@@ -50,7 +50,7 @@ formFicha.onsubmit = async (e) => {
   carregarFichas();
 };
 
-// Função para carregar fichas (já existente, mas atualizada)
+// Função para carregar fichas
 async function carregarFichas() {
   listaFichas.innerHTML = "";
   const snapshot = await db.collection("fichas")
@@ -95,6 +95,4 @@ function editarFicha(id, nome, classe, forca) {
     modal.style.display = "none";
     carregarFichas();
   };
-}
-
 }
