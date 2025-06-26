@@ -1,1 +1,4 @@
+body { font-family: sans-serif; padding: 2rem; }
+form input { margin: 0.5rem 0; display: block; }
+button { margin-top: 1rem; }
 
