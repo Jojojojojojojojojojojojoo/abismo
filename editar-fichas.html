@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editar Fichas</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 2rem; background: #f0f2f5; }
+    h1 { text-align: center; margin-bottom: 1rem; }
+    ul { list-style: none; padding: 0; }
+    li {
+      background: white; margin-bottom: 1rem; padding: 1rem; border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    button {
+      background: #4a90e2; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px;
+      cursor: pointer; margin-left: 0.5rem;
+      transition: background 0.3s ease;
+    }
+    button:hover { background: #357ABD; }
+    .edit-form {
+      display: none; margin-top: 1rem; background: #e9f0ff; padding: 1rem; border-radius: 6px;
+    }
+    .edit-form input {
+      padding: 0.5rem; margin-right: 0.5rem; border-radius: 4px; border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Editar suas Fichas</h1>
+  <ul id="lista-fichas"></ul>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const listaFichas = document.getElementById('lista-fichas');
+    let currentUser = null;
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        carregarFichas();
+      } else {
+        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      }
+    });
+
+    async function carregarFichas() {
+      listaFichas.innerHTML = '';
+      const snapshot = await db.collection('fichas')
+        .where('uid', '==', currentUser.uid)
+        .orderBy('criado', 'desc')
+        .get();
+
+      snapshot.forEach(doc => {
+        const ficha = doc.data();
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div>
+            <strong>Origem:</strong> <span class="origem">${ficha.origem}</span><br>
+            <strong>Classe:</strong> <span class="classe">${ficha.classe}</span>
+          </div>
+          <div>
+            <button onclick="mostrarEditar('${doc.id}', this)">Editar</button>
+            <button onclick="excluirFicha('${doc.id}')">Excluir</button>
+          </div>
+          <form class="edit-form" onsubmit="salvarEdicao(event, '${doc.id}', this)">
+            <input name="origem" value="${ficha.origem}" required />
+            <input name="classe" value="${ficha.classe}" required />
+            <button type="submit">Salvar</button>
+            <button type="button" onclick="fecharEditar(this)">Cancelar</button>
+          </form>
+        `;
+        listaFichas.appendChild(li);
+      });
+    }
+
+    function mostrarEditar(id, btn) {
+      const li = btn.closest('li');
+      li.querySelector('.edit-form').style.display = 'block';
+      btn.style.display = 'none';
+      li.querySelector('button:nth-child(2)').style.display = 'none'; // Esconde excluir enquanto edita
+    }
+
+    function fecharEditar(form) {
+      form.style.display = 'none';
+      const li = form.closest('li');
+      li.querySelector('button').style.display = 'inline-block'; // Mostrar botão editar
+      li.querySelector('button:nth-child(2)').style.display = 'inline-block'; // Mostrar excluir
+    }
+
+    async function salvarEdicao(e, id, form) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      try {
+        await db.collection('fichas').doc(id).update(data);
+        alert('Ficha atualizada!');
+        carregarFichas();
+      } catch (err) {
+        alert('Erro ao atualizar: ' + err.message);
+      }
+    }
+
+    async function excluirFicha(id) {
+      if (confirm('Tem certeza que quer excluir esta ficha?')) {
+        await db.collection('fichas').doc(id).delete();
+        carregarFichas();
+      }
+    }
+  </script>
+</body>
+</html>
